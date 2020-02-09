@@ -234,7 +234,7 @@ $(document).ready(function(){
     });
   }, 1000);
 
-  $(".navbar a, footer a[href='#hrvz']").on('click', function(event) {
+  $(".navbar a, footer a[href='#harvz']").on('click', function(event) {
     hashScroll(this, event);
   });
   
@@ -270,17 +270,17 @@ $(document).ready(function(){
   layer2();
   layer3();
 
-  $(".hrvz-about-img").hover(function(){
-      $(this).removeClass("hrvz-border-solid-10px-fff");
-      $(this).addClass("hrvz-border-solid-10px-00B2EE");
-      $(".hrvz-social-media-icon").fadeIn("fast");
+  $(".harvz-about-img").hover(function(){
+      $(this).removeClass("harvz-border-solid-10px-fff");
+      $(this).addClass("harvz-border-solid-10px-00B2EE");
+      $(".harvz-social-media-icon").fadeIn("fast");
     }, function(){
-      $(this).addClass("hrvz-border-solid-10px-fff");
-      $(this).removeClass("hrvz-border-solid-10px-00B2EE");
-      $(".hrvz-social-media-icon").fadeOut("fast");
+      $(this).addClass("harvz-border-solid-10px-fff");
+      $(this).removeClass("harvz-border-solid-10px-00B2EE");
+      $(".harvz-social-media-icon").fadeOut("fast");
   });
 
-  $(".hrvz-social-media-icon").on("click", function(){
+  $(".harvz-social-media-icon").on("click", function(){
     if($(this).hasClass("facebook")){ window.open("https://www.facebook.com/harvzjavier/", "_blank"); }
     if($(this).hasClass("linkedin")){ window.open("https://www.linkedin.com/in/harvz/", "_blank"); }
     if($(this).hasClass("github")){ window.open("https://github.com/harveyjavier/", "_blank"); }
@@ -288,7 +288,7 @@ $(document).ready(function(){
     if($(this).hasClass("youracclaim")){ window.open("https://www.youracclaim.com/users/harvz/badges/", "_blank"); }
   });
 
-  $(".hrvz-tools-span").on("click", function(){
+  $(".harvz-tools-span").on("click", function(){
     if($(this).hasClass("php")){ window.open("https://www.php.net/", "_blank"); }
     if($(this).hasClass("mysql")){ window.open("https://www.mysql.com/", "_blank"); }
     if($(this).hasClass("javascript")){ window.open("https://developer.mozilla.org/en-US/docs/Web/JavaScript", "_blank"); }
