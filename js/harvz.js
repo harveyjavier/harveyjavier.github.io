@@ -251,6 +251,11 @@ $(document).ready(function(){
 
   $('[data-toggle="tooltip"]').tooltip();
 
+  function layer0(){
+    $(".layer0").animate({marginTop: "+=11px"}, "slow", function(){
+      $(".layer0").animate({marginTop: "-=11px"}, "slow", layer0);
+    });
+  }
   function layer1(){
     $(".layer1").animate({marginTop: "+=10px"}, "slow", function(){
       $(".layer1").animate({marginTop: "-=10px"}, "slow", layer1);
@@ -266,6 +271,7 @@ $(document).ready(function(){
       $(".layer3").animate({marginTop: "-=5px"}, "slow", layer3);
     });
   }
+  layer0();
   layer1();
   layer2();
   layer3();
