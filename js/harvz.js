@@ -293,7 +293,6 @@ $(document).ready(function(){
     if($(this).hasClass("gitlab")){ window.open("https://gitlab.com/harveyjavier/", "_blank"); }
     if($(this).hasClass("youracclaim")){ window.open("https://www.youracclaim.com/users/harvz/badges/", "_blank"); }
   });
-
   $(".harvz-tools-span").on("click", function(){
     if($(this).hasClass("php")){ window.open("https://www.php.net/", "_blank"); }
     if($(this).hasClass("mysql")){ window.open("https://www.mysql.com/", "_blank"); }
