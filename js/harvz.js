@@ -308,6 +308,8 @@ $(document).ready(function(){
     if($(this).hasClass("ethereum")){ window.open("https://ethereum.org/", "_blank"); }
     if($(this).hasClass("flutter")){ window.open("https://flutter.dev/", "_blank"); }
     if($(this).hasClass("dart")){ window.open("https://dart.dev/", "_blank"); }
+    if($(this).hasClass("unity")){ window.open("https://unity.com/", "_blank"); }
+    if($(this).hasClass("csharp")){ window.open("https://www.w3schools.com/cs/", "_blank"); }
   });
 
   $("#send-btn").on("click", function(){
