@@ -1,3 +1,208 @@
+var firebaseConfig = {
+  apiKey: "AIzaSyA18HIOJNJCiZ4yvFW63vdfqNrOcImCBJM",
+  authDomain: "harveyjavier-github-io.firebaseapp.com",
+  databaseURL: "https://harveyjavier-github-io.firebaseio.com",
+  projectId: "harveyjavier-github-io",
+  storageBucket: "harveyjavier-github-io.appspot.com",
+  messagingSenderId: "993049186892",
+  appId: "1:993049186892:web:4756c6d2762d8dbf2cdae9",
+  measurementId: "G-2ZJSLJ71VJ"
+};
+var defaultProject = firebase.initializeApp(firebaseConfig);
+var defaultDatabase = firebase.database();
+var defaultFirestore = firebase.firestore();
+
+var isOtherWebContentFetched = false;
+var isHighlightsFetched = false;
+var isServicesFetched = false
+var isProjectsFetched = false;
+var isToolsFetched = false;
+var isCommentsFetched = false;
+var isLoaded = false;
+var about, email, address;
+var highlights;
+var services;
+var projects;
+var tools;
+var comments;
+
+setInterval(function () {
+  if (isOtherWebContentFetched && isHighlightsFetched && isServicesFetched && isProjectsFetched && isToolsFetched && isCommentsFetched && !isLoaded) {
+    $("#about-text").append(about);
+    $("#address-text").append(address);
+    $("#email-text").append(email);
+
+    highlights.forEach(function(h) {
+      $("#highlights-list").append("<li>"+h.content+"</li>");
+    });
+
+    var chunkedServices = chunkify(services, 3);
+    chunkedServices.forEach(function(cs) {
+      $("#services-div").append("<div class='row'>");
+      cs.forEach(function(s) {
+        var serviceElements = "";
+        serviceElements +=  "<div class='col-sm-4'>"+
+                              "<i class='fa "+s.icon+" logo-small'></i>"+
+                              "<h4>"+s.name+"</h4>"+
+                              "<p>"+s.description+"</p><br/><br/>"+
+                            "</div>";
+        $("#services-div").append(serviceElements);
+      });
+      
+      $("#services-div").append("</div>");
+    });
+
+    var chunkedProjects = chunkify(projects, 3);
+    chunkedProjects.forEach(function(cp) {
+      $("#projects-div").append("<div class='row text-center'>");
+      cp.forEach(function(p) {
+        var projectElements = "";
+        projectElements +=  "<div class='col-sm-4'>"+
+                              "<div class='thumbnail harvz-bg-grey'>"+
+                                "<img src='"+p.image+"' alt='"+p.name+"' width='400'>"+
+                                "<p><strong>"+p.name+"</strong></p>"+
+                                "<p>"+p.description+"</p>"+
+                                "<span>Programming Languages / Tools: </span>";
+
+        p.tools.forEach(function(t) {
+          var tool = getTool(t);
+          projectElements +=    "<span class='harvz-tools-span harvz-clickable "+tool.class_name+"' data-toggle='tooltip' title='"+tool.name+"'><img class='harvz-width-20px harvz-margin-top-5px' alt='"+tool.name+"' src='"+tool.image+"'></span>";
+        });
+                              
+        projectElements +=      "<p>Client: "+p.client+"</p>"+
+                                "<p>"+p.year.toString()+"</p>"+
+                              "</div>"+
+                            "<div>";
+        $("#projects-div").append(projectElements);
+      });
+      $("#projects-div").append("</div>");
+    });
+
+    comments.forEach(function(c, i) {
+      var cIndicator = "<li data-target='#harvzCarousel' data-slide-to='"+i+"'";
+      cIndicator += i === 0 ? "class='active'" : "";
+      cIndicator += "></li>";
+      $(".carousel-indicators").append(cIndicator);
+
+      var cInner = "<div class=";
+      cInner +=   i === 0 ? "'item active'><h4>" : "'item'><h4>";
+      c.comments.forEach(function(c_) {
+        cInner +=     c_+"<br/><br/>";
+      });
+      cInner +=     "<span>- "+
+                      "<a href='"+c.linkedin+"' target='_blank' class='harvz-clickable harvz-no-text-decoration'>"+
+                        c.name+
+                      "</a>"+
+                      ", "+c.position+", "+c.company+
+                    "</span></h4>"+
+                  "</div>";
+      $(".carousel-inner").append(cInner);
+    });
+
+    isLoaded = true;
+    $("#harvz-loader").fadeOut(function(){ $(this).remove(); });
+    $("#harvz-main-content").removeClass("harvz-invisible");
+  }
+}, 1000);
+
+getOtherWebContent();
+getHighlights();
+getServices();
+getProjects();
+getTools();
+getComments();
+
+async function getOtherWebContent() {
+  var owcRef = await defaultDatabase.ref();
+  owcRef.once("value").then(snapshot => {
+    about = snapshot.val().about;
+    email = snapshot.val().email;
+    address = snapshot.val().address;
+    isOtherWebContentFetched = true;
+  });
+}
+
+async function getHighlights() {
+  var highlightsCollection = await defaultFirestore.collection("career_highlights");
+  highlightsCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() }
+    });
+    highlights = tempDoc;
+    highlights.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
+    isHighlightsFetched = true;
+  });
+}
+
+async function getServices() {
+  var servicesCollection = await defaultFirestore.collection("services");
+  servicesCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() }
+    });
+    services = tempDoc;
+    services.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
+    isServicesFetched = true;
+  });
+}
+
+async function getProjects() {
+  var projectsCollection = await defaultFirestore.collection("projects");
+  projectsCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() }
+    });
+    projects = tempDoc;
+    projects.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
+    isProjectsFetched = true;
+  });
+}
+
+async function getTools() {
+  var toolsCollection = await defaultFirestore.collection("tools");
+  toolsCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() }
+    });
+    tools = tempDoc;
+    isToolsFetched = true;
+  });
+}
+
+async function getComments() {
+  var commentsCollection = await defaultFirestore.collection("comments");
+  commentsCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() }
+    });
+    comments = tempDoc;
+    comments.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
+    isCommentsFetched = true;
+  });
+}
+
+function chunkify(myArray, chunk_size){
+  var index = 0;
+  var arrayLength = myArray.length;
+  var tempArray = [];
+  
+  for (index = 0; index < arrayLength; index += chunk_size) {
+      myChunk = myArray.slice(index, index+chunk_size);
+      tempArray.push(myChunk);
+  }
+
+  return tempArray;
+}
+
+function getTool(id) {
+  var tool;
+  tools.forEach(function(t) {
+    if (t.id === id)
+      tool = t;
+  });
+  return tool;
+}
+
 var map;
 var markers = [];
 
@@ -170,7 +375,7 @@ function initMap(){
     zoom: 17,
     scaleControl: false,
     streetViewControl: false,
-    center: { lat:13.139122, lng:123.732329 },
+    center: { lat:13.1797, lng:123.6544 },
     clickableIcons: false,
     mapTypeControl: false,
   });
@@ -226,7 +431,7 @@ $(document).ready(function(){
   $("#map-script").attr("defer");
   $("#map-script").attr("src", "https://maps.googleapis.com/maps/api/js?key=AIzaSyCOID-HopBt5NlfrER3z0cjQ6FHjSVssBM&callback=initMap");
   setTimeout(function(){
-    addMarker(map, { lat:parseFloat(13.139122), lng:123.732329 });
+    addMarker(map, { lat:parseFloat(13.1797), lng:123.6544 });
     google.maps.event.addListener(map, 'zoom_changed', function() {
       $.each(markers, function(index, marker){
         markers[i].setIcon(markers[i].icon);
@@ -249,7 +454,9 @@ $(document).ready(function(){
     });
   });
 
-  $('[data-toggle="tooltip"]').tooltip();
+  $(document).tooltip({
+    selector: '[data-toggle="tooltip"]'
+  });
 
   function layer0(){
     $(".layer0").animate({marginTop: "+=11px"}, "slow", function(){
@@ -293,7 +500,7 @@ $(document).ready(function(){
     if($(this).hasClass("gitlab")){ window.open("https://gitlab.com/harveyjavier/", "_blank"); }
     if($(this).hasClass("youracclaim")){ window.open("https://www.youracclaim.com/users/harvz/badges/", "_blank"); }
   });
-  $(".harvz-tools-span").on("click", function(){
+  $(document).bind().on("click", ".harvz-tools-span", function(){
     if($(this).hasClass("php")){ window.open("https://www.php.net/", "_blank"); }
     if($(this).hasClass("mysql")){ window.open("https://www.mysql.com/", "_blank"); }
     if($(this).hasClass("javascript")){ window.open("https://developer.mozilla.org/en-US/docs/Web/JavaScript", "_blank"); }
