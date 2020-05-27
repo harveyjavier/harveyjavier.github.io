@@ -126,7 +126,9 @@ async function getHighlights() {
   var highlightsCollection = await defaultFirestore.collection("career_highlights");
   highlightsCollection.get().then((querySnapshot) => {
     var tempDoc = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() }
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
     });
     highlights = tempDoc;
     highlights.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
@@ -138,7 +140,9 @@ async function getServices() {
   var servicesCollection = await defaultFirestore.collection("services");
   servicesCollection.get().then((querySnapshot) => {
     var tempDoc = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() }
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
     });
     services = tempDoc;
     services.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
@@ -150,7 +154,9 @@ async function getProjects() {
   var projectsCollection = await defaultFirestore.collection("projects");
   projectsCollection.get().then((querySnapshot) => {
     var tempDoc = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() }
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
     });
     projects = tempDoc;
     projects.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
@@ -162,7 +168,9 @@ async function getTools() {
   var toolsCollection = await defaultFirestore.collection("tools");
   toolsCollection.get().then((querySnapshot) => {
     var tempDoc = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() }
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
     });
     tools = tempDoc;
     isToolsFetched = true;
@@ -173,7 +181,9 @@ async function getComments() {
   var commentsCollection = await defaultFirestore.collection("comments");
   commentsCollection.get().then((querySnapshot) => {
     var tempDoc = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() }
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
     });
     comments = tempDoc;
     comments.sort((a, b) => (a.created_at > b.created_at) ? 1 : -1)
@@ -200,7 +210,7 @@ function getTool(id) {
     if (t.id === id)
       tool = t;
   });
-  return tool;
+  return tool
 }
 
 var map;
