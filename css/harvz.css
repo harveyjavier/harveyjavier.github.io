@@ -249,6 +249,10 @@ footer .glyphicon {
   resize: none;
 }
 
+.harvz-hover-opacity-0-7:hover{
+  opacity: 0.7;
+}
+
 .harvz-bg-white {
   background-color: #fff;
 }
@@ -408,4 +412,31 @@ footer .glyphicon {
   background: url("../assets/images/me.jpg");
   background-repeat: no-repeat;
   background-size: 250px 250px;
+}
+
+.modal-content {
+  width: 80%;
+  max-width: 700px;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.modal-content {
+  animation-name: zoom;
+  animation-duration: 0.3s;
+}
+
+@keyframes zoom {
+  from {transform:scale(0)}
+  to {transform:scale(1)}
+}
+
+@media only screen and (max-width: 700px){
+  .modal-content {
+    width: 100%;
+  }
 }

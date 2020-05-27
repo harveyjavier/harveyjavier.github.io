@@ -59,7 +59,7 @@ setInterval(function () {
         var projectElements = "";
         projectElements +=  "<div class='col-sm-4'>"+
                               "<div class='thumbnail harvz-bg-grey'>"+
-                                "<img src='"+p.image+"' alt='"+p.name+"' width='400'>"+
+                                "<img class='portfolio-image harvz-clickable harvz-hover-opacity-0-7' src='"+p.image+"' alt='"+p.name+"' width='400'>"+
                                 "<p><strong>"+p.name+"</strong></p>"+
                                 "<p>"+p.description+"</p>"+
                                 "<span>Programming Languages / Tools: </span>";
@@ -501,6 +501,16 @@ $(document).ready(function(){
       $(this).addClass("harvz-border-solid-10px-fff");
       $(this).removeClass("harvz-border-solid-10px-00B2EE");
       $(".harvz-social-media-icon").fadeOut("fast");
+  });
+
+  $(document).on("click", ".portfolio-image", function(){
+    //$("#harvz-image-modal").fadeIn();
+    $(".modal").modal("toggle");
+    $(".modal-content").attr("src", $(this).attr("src"));
+  });
+
+  $(".modal").click(function() {
+    $(".modal").modal("toggle");
   });
 
   $(".harvz-social-media-icon").on("click", function(){
