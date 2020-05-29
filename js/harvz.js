@@ -14,20 +14,24 @@ var defaultFirestore = firebase.firestore();
 
 var isOtherWebContentFetched = false;
 var isHighlightsFetched = false;
-var isServicesFetched = false
+var isServicesFetched = false;
+var isCertificationsFetched = false;
 var isProjectsFetched = false;
 var isToolsFetched = false;
+var isIssuersFetched = false;
 var isCommentsFetched = false;
 var isLoaded = false;
 var about, email, address;
 var highlights;
 var services;
+var certifications;
 var projects;
 var tools;
+var issuers;
 var comments;
 
 setInterval(function () {
-  if (isOtherWebContentFetched && isHighlightsFetched && isServicesFetched && isProjectsFetched && isToolsFetched && isCommentsFetched && !isLoaded) {
+  if (isOtherWebContentFetched && isHighlightsFetched && isServicesFetched && isCertificationsFetched && isProjectsFetched && isToolsFetched && isIssuersFetched && isCommentsFetched && !isLoaded) {
     $("#about-text").append(about);
     $("#address-text").append(address);
     $("#email-text").append(email);
@@ -52,15 +56,34 @@ setInterval(function () {
       $("#services-div").append("</div>");
     });
 
+    var chunkedCertifications = chunkify(certifications, 4);
+    chunkedCertifications.forEach(function(c) {
+      $("#certifications-div").append("<div class='row'>");
+      c.forEach(function(c_) {
+        var issuer = getIssuer(c_.issuer);
+        var certificationElements = "";
+        certificationElements +=  "<div class='col-sm-3'>"+
+                              "<img src='"+issuer.image+"' width='70'><br/><br/>"+
+                              "<p><strong>"+c_.name+"</strong></p>"+
+                              "<p>"+c_.issued_at+"</p>"+
+                              "<a class='harvz-no-text-decoration' href='"+c_.url+"' target='_blank'>View credential</a><br/><br/>"+
+                            "</div>";
+        $("#certifications-div").append(certificationElements);
+      });
+      
+      $("#certifications-div").append("</div>");
+    });
+
     var chunkedProjects = chunkify(projects, 3);
     chunkedProjects.forEach(function(cp) {
       $("#projects-div").append("<div class='row text-center'>");
       cp.forEach(function(p) {
         var projectElements = "";
+        var projectURL = p.url === null ? "" : "<p><a class='harvz-no-text-decoration' href='"+p.url+"' target='_blank'>View project</a></p>";
         projectElements +=  "<div class='col-sm-4'>"+
-                              "<div class='thumbnail harvz-bg-grey'>"+
-                                "<img class='portfolio-image harvz-clickable harvz-hover-opacity-0-7' src='"+p.image+"' alt='"+p.name+"' width='400'>"+
-                                "<p><strong>"+p.name+"</strong></p>"+
+                              "<div class='thumbnail harvz-bg-white'>"+
+                                "<img class='portfolio-image harvz-undraggable harvz-clickable harvz-hover-opacity-0-7' src='"+p.image+"' alt='"+p.name+"' width='400'>"+
+                                "<p><strong>"+p.name+"</strong> ("+p.year.toString()+")</p>"+
                                 "<p>"+p.description+"</p>"+
                                 "<span>Programming Languages / Tools: </span>";
 
@@ -70,7 +93,7 @@ setInterval(function () {
         });
                               
         projectElements +=      "<p>Client: "+p.client+"</p>"+
-                                "<p>"+p.year.toString()+"</p>"+
+                                projectURL+
                               "</div>"+
                             "<div>";
         $("#projects-div").append(projectElements);
@@ -108,8 +131,10 @@ setInterval(function () {
 getOtherWebContent();
 getHighlights();
 getServices();
+getCertifications();
 getProjects();
 getTools();
+getIssuers();
 getComments();
 
 async function getOtherWebContent() {
@@ -150,6 +175,20 @@ async function getServices() {
   });
 }
 
+async function getCertifications() {
+  var certificationsCollection = await defaultFirestore.collection("certifications");
+  certificationsCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
+    });
+    certifications = tempDoc;
+    certifications.sort((a, b) => (a.created_at < b.created_at) ? 1 : -1)
+    isCertificationsFetched = true;
+  });
+}
+
 async function getProjects() {
   var projectsCollection = await defaultFirestore.collection("projects");
   projectsCollection.get().then((querySnapshot) => {
@@ -174,6 +213,19 @@ async function getTools() {
     });
     tools = tempDoc;
     isToolsFetched = true;
+  });
+}
+
+async function getIssuers() {
+  var issuersCollection = await defaultFirestore.collection("issuers");
+  issuersCollection.get().then((querySnapshot) => {
+    var tempDoc = querySnapshot.docs.map((doc) => {
+      var dd = doc.data();
+      dd.id = doc.id;
+      return dd;
+    });
+    issuers = tempDoc;
+    isIssuersFetched = true;
   });
 }
 
@@ -213,215 +265,13 @@ function getTool(id) {
   return tool
 }
 
-var map;
-var markers = [];
-
-function initMap(){
-  var styledMapType = new google.maps.StyledMapType(
-    [
-      {
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#f5f5f5"
-          }
-        ]
-      },
-      {
-        "elementType": "labels.icon",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      },
-      {
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#616161"
-          }
-        ]
-      },
-      {
-        "elementType": "labels.text.stroke",
-        "stylers": [
-          {
-            "color": "#f5f5f5"
-          }
-        ]
-      },
-      {
-        "featureType": "administrative.land_parcel",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#bdbdbd"
-          }
-        ]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#eeeeee"
-          }
-        ]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#757575"
-          }
-        ]
-      },
-      {
-        "featureType": "poi.park",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#e5e5e5"
-          }
-        ]
-      },
-      {
-        "featureType": "poi.park",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#9e9e9e"
-          }
-        ]
-      },
-      {
-        "featureType": "road",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#ffffff"
-          }
-        ]
-      },
-      {
-        "featureType": "road.arterial",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#757575"
-          }
-        ]
-      },
-      {
-        "featureType": "road.highway",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#dadada"
-          }
-        ]
-      },
-      {
-        "featureType": "road.highway",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#616161"
-          }
-        ]
-      },
-      {
-        "featureType": "road.local",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#9e9e9e"
-          }
-        ]
-      },
-      {
-        "featureType": "transit.line",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#e5e5e5"
-          }
-        ]
-      },
-      {
-        "featureType": "transit.station",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#eeeeee"
-          }
-        ]
-      },
-      {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "color": "#c9c9c9"
-          }
-        ]
-      },
-      {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#9e9e9e"
-          }
-        ]
-      }
-    ],
-    {name: "Styled Map"}
-  );
-
-  map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 17,
-    scaleControl: false,
-    streetViewControl: false,
-    center: { lat:13.1797, lng:123.6544 },
-    clickableIcons: false,
-    mapTypeControl: false,
+function getIssuer(id) {
+  var issuer;
+  issuers.forEach(function(i) {
+    if (i.id === id)
+      issuer = i;
   });
-  map.mapTypes.set("styled_map", styledMapType);
-  map.setMapTypeId("styled_map");
-}
-
-function markerBounce (marker) {
-  if (marker.getAnimation() != null) {
-    marker.setAnimation(null);
-  } else {
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-  }
-}
-
-function addMarker(map, location) {
-  location = new google.maps.LatLng(location.lat, location.lng);
-
-  var icon = {
-    url: "assets/images/marker.png",
-    scaledSize: new google.maps.Size(50, 50),
-    origin: new google.maps.Point(0,0),
-    anchor: new google.maps.Point(0,0)
-  };
-
-  var marker = new google.maps.Marker({
-    position: location,
-    map: map,
-    animation: google.maps.Animation.DROP,
-    icon: icon,
-  });
-  marker.icon = { url:"assets/images/marker.png", scaledSize:new google.maps.Size(50, 50) };
-  markers.push(marker);
-
-  markerBounce(marker);
-  setTimeout(markerBounce(marker), 1500);
+  return issuer
 }
 
 function hashScroll(t, e){
@@ -437,18 +287,6 @@ function hashScroll(t, e){
 }
 
 $(document).ready(function(){
-  $("#map-script").attr("async");
-  $("#map-script").attr("defer");
-  $("#map-script").attr("src", "https://maps.googleapis.com/maps/api/js?key=AIzaSyCOID-HopBt5NlfrER3z0cjQ6FHjSVssBM&callback=initMap");
-  setTimeout(function(){
-    addMarker(map, { lat:parseFloat(13.1797), lng:123.6544 });
-    google.maps.event.addListener(map, 'zoom_changed', function() {
-      $.each(markers, function(index, marker){
-        markers[i].setIcon(markers[i].icon);
-      });
-    });
-  }, 1000);
-
   $(".navbar a, footer a[href='#harvz']").on('click', function(event) {
     hashScroll(this, event);
   });
@@ -496,11 +334,11 @@ $(document).ready(function(){
   $(".harvz-about-img").hover(function(){
       $(this).removeClass("harvz-border-solid-10px-fff");
       $(this).addClass("harvz-border-solid-10px-00B2EE");
-      $(".harvz-social-media-icon").fadeIn("fast");
+      $(".harvz-cv-btn").fadeIn("fast");
     }, function(){
       $(this).addClass("harvz-border-solid-10px-fff");
       $(this).removeClass("harvz-border-solid-10px-00B2EE");
-      $(".harvz-social-media-icon").fadeOut("fast");
+      $(".harvz-cv-btn").fadeOut("fast");
   });
 
   $(document).on("click", ".portfolio-image", function(){
