@@ -277,6 +277,10 @@ footer .glyphicon {
   width: 20px !important;
 }
 
+.harvz-width-30px{
+  width: 30px;
+}
+
 .harvz-width-40px{
   width: 40px;
 }
@@ -303,6 +307,10 @@ footer .glyphicon {
 
 .harvz-width-260px{
   width: 260px;
+}
+
+.harvz-height-30px{
+  height: 30px;
 }
 
 .harvz-height-40px{
@@ -373,6 +381,10 @@ footer .glyphicon {
   margin-top: 5px !important;
 }
 
+.harvz-margin-top-15px{
+  margin-top: 15px !important;
+}
+
 .harvz-no-text-decoration{
   text-decoration: none !important;
 }
@@ -397,10 +409,17 @@ footer .glyphicon {
   margin-top:-60px;
 }
 
-.harvz-social-media-icon{
+.harvz-social-media-container{
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.harvz-social-media-icon{
+  display: flex;
+}
+
+.harvz-cv-btn{
   display: none;
 }
 
