@@ -433,6 +433,15 @@ footer .glyphicon {
   background-size: 250px 250px;
 }
 
+.harvz-socmed-icon{
+  color: #00B2EE;
+  font-size: 24px;
+}
+
+.harvz-socmed-icon:hover{
+  color: #475b76;
+}
+
 .modal-content {
   width: 80%;
   max-width: 700px;

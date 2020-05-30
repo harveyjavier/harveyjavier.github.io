@@ -350,14 +350,7 @@ $(document).ready(function(){
   $(".modal").click(function() {
     $(".modal").modal("toggle");
   });
-
-  $(".harvz-social-media-icon").on("click", function(){
-    if($(this).hasClass("facebook")){ window.open("https://www.facebook.com/harvzjavier/", "_blank"); }
-    if($(this).hasClass("linkedin")){ window.open("https://www.linkedin.com/in/harvz/", "_blank"); }
-    if($(this).hasClass("github")){ window.open("https://github.com/harveyjavier/", "_blank"); }
-    if($(this).hasClass("gitlab")){ window.open("https://gitlab.com/harveyjavier/", "_blank"); }
-    if($(this).hasClass("youracclaim")){ window.open("https://www.youracclaim.com/users/harvz/badges/", "_blank"); }
-  });
+  
   $(document).bind().on("click", ".harvz-tools-span", function(){
     if($(this).hasClass("php")){ window.open("https://www.php.net/", "_blank"); }
     if($(this).hasClass("mysql")){ window.open("https://www.mysql.com/", "_blank"); }
